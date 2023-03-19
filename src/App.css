@@ -26,3 +26,10 @@
 .movie {
   max-width: 400px;
 }
+
+.main {
+  min-height: calc(100vh - 100px);
+}
+.footerComponent {
+  height: 30px;
+}

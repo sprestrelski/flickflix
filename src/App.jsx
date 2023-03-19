@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import APIForm from './Components/APIForm'
+import Footer from './Components/Footer'
 
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
@@ -13,7 +14,7 @@ function App() {
   const [genres, setGenres] = useState([]);
   const [voteAvg, setVoteAvg] = useState(0);
   const [voteCount, setVoteCount] = useState(0);
-  const [pageIndex, setPageIndex] = useState(500);
+  const pageIndex = 100;
 
   
   const submitForm = () => {
@@ -66,38 +67,41 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Flick Flix 🎥</h1>
-      Flick through popular movies and discover new fresh favorites.
-      
-      <APIForm 
-        onSubmit={submitForm}  
-      />
+      <div className="main">
+        <h1>Flick Flix 🎥</h1>
+        Flick through popular movies and discover new favorites.
+        
+        <APIForm 
+          onSubmit={submitForm}  
+        />
 
-      {currentImage ? (
-        <div className="movieInfo">
+        {currentImage ? (
+          <div className="movieInfo">
 
-          <div className="movie">
-            <div className="movieHeader">
-              <h2>{title}</h2>
-              <h4>{voteAvg}/10 ⭐ | {voteCount} votes</h4>
+            <div className="movie">
+              <div className="movieHeader">
+                <h2>{title}</h2>
+                <h4>{voteAvg}/10 ⭐ | {voteCount} votes</h4>
+              </div>
+              <div className="movieOverview">
+                <p>{overview}</p>
+              </div>
             </div>
-            <div className="movieOverview">
-              <p>{overview}</p>
+
+            <div className="movie">
+              <img
+                className="moviePoster"
+                src={currentImage}
+                alt="movie poster returned"
+              />
             </div>
-          </div>
 
-          <div className="movie">
-            <img
-              className="moviePoster"
-              src={currentImage}
-              alt="movie poster returned"
-            />
           </div>
-
-        </div>
-      ) : (
-        <div></div>
-      )}
+        ) : (
+          <div></div>
+        )}
+      </div>
+      <Footer/>
     </div>
   )
 }
