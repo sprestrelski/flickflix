@@ -8,3 +8,21 @@
 .card {
   padding: 2em;
 }
+
+.movieInfo {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: left;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1em;
+}
+
+.moviePoster {
+  max-width: 250px;
+  margin-left: 1.5em;
+}
+
+.movie {
+  max-width: 400px;
+}
