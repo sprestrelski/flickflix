@@ -2,14 +2,15 @@ import { useState } from 'react'
 import './App.css'
 import APIForm from './Components/APIForm'
 import Footer from './Components/Footer'
+import Gallery from './Components/Gallery'
 
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
   const [currentImage, setCurrentImage] = useState(null);
   const [prevImages, setPrevImages] = useState([]);
+  const [prevTitles, setPrevTitles] = useState([]);
   
   const [title, setTitle] = useState("");
-  const [isAdult, setIsAdult] = useState(false);
   const [overview, setOverview] = useState("");
   const [genres, setGenres] = useState([]);
   const [voteAvg, setVoteAvg] = useState(0);
@@ -36,7 +37,7 @@ function App() {
     let vote_average_lte = "";
 
     let page = Math.floor(Math.random() * pageIndex) + 1;
-    let query = `https://api.themoviedb.org/3/discover/movie?sort_by=${sort_by}&api_key=${ACCESS_KEY}&page=${page}&without_genres=${without_genres}&vote_average.gte=${vote_average_gte}&vote_average.lte=${vote_average_lte}&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
+    let query = `https://api.themoviedb.org/3/discover/movie?sort_by=${sort_by}&api_key=${ACCESS_KEY}&page=${page}&without_genres=${without_genres}&vote_average.gte=${vote_average_gte}&vote_average.lte=${vote_average_lte}&include_adult=false&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
     callAPI(query).catch(console.error);
   }
 
@@ -56,11 +57,11 @@ function App() {
     
     setTitle(result.title);
     setOverview(result.overview);
-    setIsAdult(result.adult);
     setVoteAvg(result.vote_average);
     setVoteCount(result.vote_count);
     setCurrentImage(poster_url);
     setPrevImages((images) => [...images, poster_url]);
+    setPrevTitles((titles) => [...titles, result.title]);
   }
 
 
@@ -100,6 +101,9 @@ function App() {
         ) : (
           <div></div>
         )}
+      </div>
+      <div className="left-sidebar">
+        <Gallery images={prevImages} titles={prevTitles}/>
       </div>
       <Footer/>
     </div>
