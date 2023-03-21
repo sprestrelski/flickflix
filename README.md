@@ -14,12 +14,12 @@ The following **required** functionality is completed:
 - [X] **Only one item/API call is viewable at a time**
 - [X] **API calls appear random to the user**
 - [X] **At least one image is displayed per API call**
-- [ ] **Clicking on a displayed value for one attribute adds it to a displayed ban list**
-- [ ] **Attributes on the ban list prevent further images/API results with that attribute from being displayed**
+- [X] **Clicking on a displayed value for one attribute adds it to a displayed ban list**
+- [X] **Attributes on the ban list prevent further images/API results with that attribute from being displayed**
 
 The following **optional** features are implemented:
 
-- [ ] Multiple types of attributes can be added to the ban list
+- [X] Multiple types of attributes can be added to the ban list
 - [X] Users can see a stored history of their previously viewed items from their session
 
 ## Video Walkthrough
