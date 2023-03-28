@@ -13,6 +13,7 @@ function App() {
 
   const [list, setList] = useState(null);
 
+  // fetch top 20 movies this week
   useEffect(() => {
     const fetchMovieData = async () => {
       const response = await fetch(
@@ -23,60 +24,66 @@ function App() {
       setList(json);
     }
     fetchMovieData().catch(console.error);
-    console.log(list);
   }, []);
 
-  const makeMovieQuery = async () => {
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
-    // handle if there are less pages than we have access to
-    if (json.total_pages < page) {
-      setPageIndex(json.total_pages);
-      page = Math.floor(Math.random() * json.total_pages) + 1;
-      query = `https://api.themoviedb.org/3/discover/movie?sort_by=${sort_by}&api_key=${ACCESS_KEY}&page=${page}&without_genres=${without_genres}&vote_average.gte=${vote_average_gte}&vote_count.gte=${vote_count_gte}&include_adult=false&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
-      response = await fetch(query);
-      json = await response.json();
+  const searchItems = searchValue => {
+    setSearchInput(searchValue);
+    if (searchValue !== "") {
+      const filteredData = list.results.filter( function(movie) {
+        return (movie.title.toLowerCase()).includes(searchValue.toLowerCase())
+      })
+      setFilteredResults(filteredData);
+      console.log(filteredData);
+    } else {
+      setFilteredResults(Object.keys(list.results));
     }
-
-    console.log(query);
-
-    // get a random result from the page
-    const num_results = json.results.length;
-    const results_index = Math.floor(Math.random() * num_results);
-    const result = json.results[results_index];
-    
-    // set movie information
-    const poster_url = "https://image.tmdb.org/t/p/" + "w500" + result.poster_path;
-    setTitle(result.title);
-    setOverview(result.overview);
-    setVoteAvg(result.vote_average);
-    setVoteCount(result.vote_count);
-    setCurrentImage(poster_url);
-    setGenres(result.genre_ids);
-    setPrevImages((images) => [...images, poster_url]);
-    setPrevTitles((titles) => [...titles, result.title]);
-    console.log(result);
-  }
+  };
 
   return (
     <div className="App">
       <div className="main">
         <h1>Flick Flix 🎥</h1>
         Explore the 20 most popular movies this week. 
+        <br></br>
+
+        <input
+          type="text"
+          placeholder="Search Titles"
+          onChange={(inputString) => searchItems(inputString.target.value)}
+        />
+
 
         <ul>
-          {list && Object.entries(list.results).map(([index]) =>
-            <MovieInfo
-              key={list.results[index].id}
-              id={list.results[index].id}
-              title={list.results[index].title}
-              image={list.results[index].poster_path}
-              voteAvg={list.results[index].vote_average}
-              voteCount={list.results[index].vote_count}
-              overview={list.results[index].overview}
-              releaseDate={list.results[index].release_date}
-            />
-            // <li key={list.results[index].id}>{list.results[index].title}</li>
+          {searchInput.length > 0
+            ? filteredResults.map((index) => 
+                //<li>{index.title}</li>
+                <MovieInfo
+                key={index.id}
+                id={index.id}
+                title={index.title}
+                image={index.poster_path}
+                voteAvg={index.vote_average}
+                voteCount={index.vote_count}
+                overview={index.overview}
+                releaseDate={index.release_date}
+                />
+              
+              ) : list && Object.entries(list.results).map(([index]) =>
+                <MovieInfo
+                  key={list.results[index].id}
+                  id={list.results[index].id}
+                  title={list.results[index].title}
+                  image={list.results[index].poster_path}
+                  voteAvg={list.results[index].vote_average}
+                  voteCount={list.results[index].vote_count}
+                  overview={list.results[index].overview}
+                  releaseDate={list.results[index].release_date}
+                />
           )}
+          
         </ul>
       </div>
       
