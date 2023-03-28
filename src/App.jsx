@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import MovieInfo from './Components/MovieInfo'
 import Footer from './Components/Footer'
-//import Gallery from './Components/Gallery'
-
-// average popularity
-// average vote count
-// most popular language
+import { updateExpression } from 'babel-types';
 
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
@@ -26,22 +22,42 @@ function App() {
     fetchMovieData().catch(console.error);
   }, []);
 
+  // filter results to user input
   const [filteredResults, setFilteredResults] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
 
-  const searchItems = searchValue => {
+
+  // filter by title
+  const [searchInput, setSearchInput] = useState("");
+  const searchTitles = searchValue => {
     setSearchInput(searchValue);
     if (searchValue !== "") {
       const filteredData = list.results.filter( function(movie) {
         return (movie.title.toLowerCase()).includes(searchValue.toLowerCase())
       })
       setFilteredResults(filteredData);
-      console.log(filteredData);
     } else {
       setFilteredResults(Object.keys(list.results));
     }
   };
 
+  // filter by vote average/"stars"
+  const [upperStarRange, setUpperStarRange] = useState(10);
+  const [lowerStarRange, setLowerStarRange] = useState(0);
+
+  const filterStars = (lowerRange, upperRange) => {
+    setUpperStarRange(upperRange);
+    setLowerStarRange(lowerRange);
+    if (lowerRange != 0 || upperRange != 10) {
+      const filteredData = list.results.filter( function(movie) {
+        return (movie.vote_average <= upperRange && movie.vote_average >= lowerRange)
+      })
+      setFilteredResults(filteredData);
+      console.log(filteredData);
+    } else {
+      setFilteredResults(Object.keys(list.results));
+    }
+  }
+  
   return (
     <div className="App">
       <div className="main">
@@ -52,12 +68,24 @@ function App() {
         <input
           type="text"
           placeholder="Search Titles"
-          onChange={(inputString) => searchItems(inputString.target.value)}
+          onChange={(inputString) => searchTitles(inputString.target.value)}
+        />
+
+        <br></br>
+        <input
+          type="number"
+          placeholder={lowerStarRange}
+          onChange={(inputString) => filterStars(inputString.target.value, upperStarRange)}
+        />
+        <input
+          type="number"
+          placeholder={upperStarRange}
+          onChange={(inputString) => filterStars(lowerStarRange, inputString.target.value)}
         />
 
 
         <ul>
-          {searchInput.length > 0
+          {searchInput.length > 0 || lowerStarRange != 0 || upperStarRange != 10
             ? filteredResults.map((index) => 
                 //<li>{index.title}</li>
                 <MovieInfo
