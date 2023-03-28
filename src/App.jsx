@@ -7,7 +7,9 @@ import { updateExpression } from 'babel-types';
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
 
+  const [json, setJson] = useState(null);
   const [list, setList] = useState(null);
+  const [filteredResults, setFilteredResults] = useState([]);
 
   // fetch top 20 movies this week
   useEffect(() => {
@@ -17,27 +19,44 @@ function App() {
         + ACCESS_KEY
       );
       let json = await response.json();
-      setList(json);
+      setJson(json);
+      setList(json.results);
+      setFilteredResults(json.results);
     }
     fetchMovieData().catch(console.error);
   }, []);
 
-  // filter results to user input
-  const [filteredResults, setFilteredResults] = useState([]);
-
+  // master filter function
+  const filterFunction = (searchValue, lowerRange, upperRange) => {
+    let filteredData = list;
+    let useFilter = false;
+    if (searchValue !== "") {
+      filteredData = filteredData.filter( function(movie) {
+        return (movie.title.toLowerCase()).includes(searchValue.toLowerCase())
+      })
+      useFilter = true;
+    }
+    
+    if (lowerRange != 0 || upperRange != 10) {
+      filteredData = filteredData.filter( function(movie) {
+        return (movie.vote_average <= upperRange && movie.vote_average >= lowerRange)
+      })
+      useFilter = true;
+    }
+    
+    if (useFilter) {
+      setFilteredResults(filteredData);
+    } else {
+      setFilteredResults(list);
+    }
+  
+  }
 
   // filter by title
   const [searchInput, setSearchInput] = useState("");
-  const searchTitles = searchValue => {
+  const filterTitles = searchValue => {
     setSearchInput(searchValue);
-    if (searchValue !== "") {
-      const filteredData = list.results.filter( function(movie) {
-        return (movie.title.toLowerCase()).includes(searchValue.toLowerCase())
-      })
-      setFilteredResults(filteredData);
-    } else {
-      setFilteredResults(Object.keys(list.results));
-    }
+    filterFunction(searchValue, lowerStarRange, upperStarRange);
   };
 
   // filter by vote average/"stars"
@@ -47,17 +66,10 @@ function App() {
   const filterStars = (lowerRange, upperRange) => {
     setUpperStarRange(upperRange);
     setLowerStarRange(lowerRange);
-    if (lowerRange != 0 || upperRange != 10) {
-      const filteredData = list.results.filter( function(movie) {
-        return (movie.vote_average <= upperRange && movie.vote_average >= lowerRange)
-      })
-      setFilteredResults(filteredData);
-      console.log(filteredData);
-    } else {
-      setFilteredResults(Object.keys(list.results));
-    }
+    filterFunction(searchInput, lowerRange, upperRange);
   }
-  
+
+
   return (
     <div className="App">
       <div className="main">
@@ -65,29 +77,39 @@ function App() {
         Explore the 20 most popular movies this week. 
         <br></br>
 
-        <input
-          type="text"
-          placeholder="Search Titles"
-          onChange={(inputString) => searchTitles(inputString.target.value)}
-        />
+        <div className="input-container">
+          <input
+            type="text"
+            placeholder="Search Titles"
+            onChange={(inputString) => filterTitles(inputString.target.value)}
+          />
+        </div>
 
-        <br></br>
-        <input
-          type="number"
-          placeholder={lowerStarRange}
-          onChange={(inputString) => filterStars(inputString.target.value, upperStarRange)}
-        />
-        <input
-          type="number"
-          placeholder={upperStarRange}
-          onChange={(inputString) => filterStars(lowerStarRange, inputString.target.value)}
-        />
-
+        <div className="input-container">
+          Ratings:&nbsp;
+          <input
+            className="starRange"
+            type="number"
+            value={lowerStarRange}
+            step="0.01"
+            min="0"
+            max="10"
+            onChange={(inputString) => filterStars(inputString.target.value, upperStarRange)}
+          />
+          <input
+            className="starRange"
+            type="number"
+            value={upperStarRange}
+            step="0.01"
+            min="0"
+            max="10"
+            onChange={(inputString) => filterStars(lowerStarRange, inputString.target.value)}
+          />
+        </div>
 
         <ul>
           {searchInput.length > 0 || lowerStarRange != 0 || upperStarRange != 10
             ? filteredResults.map((index) => 
-                //<li>{index.title}</li>
                 <MovieInfo
                 key={index.id}
                 id={index.id}
@@ -99,16 +121,16 @@ function App() {
                 releaseDate={index.release_date}
                 />
               
-              ) : list && Object.entries(list.results).map(([index]) =>
+              ) : list && list.map((index) =>
                 <MovieInfo
-                  key={list.results[index].id}
-                  id={list.results[index].id}
-                  title={list.results[index].title}
-                  image={list.results[index].poster_path}
-                  voteAvg={list.results[index].vote_average}
-                  voteCount={list.results[index].vote_count}
-                  overview={list.results[index].overview}
-                  releaseDate={list.results[index].release_date}
+                  key={index.id}
+                  id={index.id}
+                  title={index.title}
+                  image={index.poster_path}
+                  voteAvg={index.vote_average}
+                  voteCount={index.vote_count}
+                  overview={index.overview}
+                  releaseDate={index.release_date}
                 />
           )}
           
