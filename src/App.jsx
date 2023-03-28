@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import MovieInfo from './Components/MovieInfo'
 import Footer from './Components/Footer'
-import { updateExpression } from 'babel-types';
-
+import Card from './Components/Card'
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
 
@@ -22,6 +21,7 @@ function App() {
       setJson(json);
       setList(json.results);
       setFilteredResults(json.results);
+      dataStatistics(json.results);
     }
     fetchMovieData().catch(console.error);
   }, []);
@@ -46,10 +46,13 @@ function App() {
     
     if (useFilter) {
       setFilteredResults(filteredData);
+      dataStatistics(filteredData);
     } else {
       setFilteredResults(list);
+      dataStatistics(list);
     }
   
+    
   }
 
   // filter by title
@@ -70,15 +73,72 @@ function App() {
   }
 
 
+  // data statistics
+  const [voteAvgTotal, setVoteAvgTotal] = useState(0);
+  const [voteCountTotal, setVoteCountTotal] = useState(0);
+  const [ratedOverall, setRatedOverall] = useState(["", ""]);
+  const dataStatistics = (filteredData) => {
+    // calculate average rating of movies
+    let voteAvg = 0;
+    let lowestAvg = 0, highestAvg = 0;
+    let lowestTitle = "", highestTitle = "";
+
+    if (filteredData.length <= 0) voteAvg = 0;
+    else {
+      lowestAvg = filteredData[0].vote_average;
+      highestAvg = filteredData[0].vote_average;
+      lowestTitle = filteredData[0].title;
+      highestTitle = filteredData[0].title;
+      
+      for (let item = 0; item < filteredData.length; item++) {
+        let avg = filteredData[item].vote_average
+        voteAvg += avg;
+        if (avg < lowestAvg) {
+          lowestTitle = filteredData[item].title;
+          lowestAvg = avg;
+        } else if (avg > highestAvg) {
+          highestTitle = filteredData[item].title;
+          highestAvg = avg;
+        }
+      }
+      voteAvg /= filteredData.length;
+      
+    }
+    setVoteAvgTotal(voteAvg.toFixed(3));
+    setRatedOverall([lowestTitle, highestTitle]);
+    console.log([lowestTitle, highestTitle]);
+    
+    
+    // calculate average number of votes cast across movies
+    let voteCount = 0;
+    if (filteredData.length <= 0) voteCount = 0;
+    else {
+      for (const item in filteredData) {
+        voteCount += filteredData[item].vote_count;
+      }
+      voteCount/= filteredData.length;
+    }
+    setVoteCountTotal(voteCount.toFixed(0));
+    
+  }
+
   return (
     <div className="App">
       <div className="main">
         <h1>Flick Flix 🎥</h1>
-        Explore the 20 most popular movies this week. 
+        Explore the most popular movies this week. 
         <br></br>
 
+        <div className="cards-container">
+          <Card heading="Average Rating" subheading={voteAvgTotal}/>
+          <Card heading="Average Votes" subheading={voteCountTotal}/>
+          <Card heading="Lowest Rated Title" subheading={ratedOverall[0]}/>
+          <Card heading="Highest Rated Title" subheading={ratedOverall[1]}/>
+        </div>
+        
+
         <div className="input-container">
-          <input
+          Filter:&nbsp;<input
             type="text"
             placeholder="Search Titles"
             onChange={(inputString) => filterTitles(inputString.target.value)}

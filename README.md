@@ -4,7 +4,7 @@ Submitted by: Samantha Prestrelski
 
 This web app: Explore the 20 most popular movies this week.
 
-Time spent: **X** hours spent in total
+Time spent: 10 hours spent in total
 
 ## Required Features
 
@@ -12,8 +12,11 @@ The following **required** functionality is completed:
 
 - [X] The list displays a list of data fetched using an API call
 - [X] Data uses the useEffect React hook and async/await syntax
-- [ ] **The app dashboard includes at least three summary statistics about the data such as**
-  - [ ] *insert details*
+- [X] The app dashboard includes at least three summary statistics about the data such as
+  - [X] Average rating
+  - [X] Average number of votes cast per movie
+  - [X] Lowest rated popular title
+  - [X] Highest rated popular title
 - [X] A search bar allows the user to search for an item in the fetched data
 - [X] Multiple different filters (2+) allow the user to filter items in the database by specified categories
 
@@ -27,10 +30,10 @@ The following **optional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/sprestrelski/flickflix/blob/dashboard/demo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 <!-- Replace this with whatever GIF tool you used! -->
-GIF created with ...  
+GIF created with ezgif
 <!-- Recommended tools:
 [Kap](https://getkap.co/) for macOS
 [ScreenToGif](https://www.screentogif.com/) for Windows
