@@ -39,6 +39,40 @@ GIF created with ezgif
 [ScreenToGif](https://www.screentogif.com/) for Windows
 [peek](https://github.com/phw/peek) for Linux. -->
 
+
+# Web Development Project 6 - *Name of App Here*
+
+Submitted by: **Your Name Here**
+
+This web app: **insert description**
+
+Time spent: **X** hours spent in total
+
+## Required Features
+
+The following **required** functionality is completed:
+
+- [ ] **The app includes at least two unique chart developed using the fetched data that tell an interesting story**
+- [X] **Clicking on an item in the list view displays more details about it**
+- [X] **Clicking on an item has a direct, unique link to that item's detail view page**
+
+
+The following **optional** features are implemented:
+
+- [ ] The site's customized dashboard contains more content that explains what is interesting about the data
+- [ ] The site allows users to toggle between different data visualizations
+
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+<!-- Replace this with whatever GIF tool you used! -->
+GIF created with ...  
+<!-- Recommended tools:
+[Kap](https://getkap.co/) for macOS
+[ScreenToGif](https://www.screentogif.com/) for Windows
+[peek](https://github.com/phw/peek) for Linux. -->
+
 ## License
 
     Copyright 2023 Samantha Prestrelski

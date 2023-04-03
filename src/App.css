@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -59,3 +59,18 @@
   justify-content: center;
   margin-top: 10px;
 }
+
+
+
+nav {
+  position: fixed; 
+  top: 0; 
+  right: 0; 
+}
+
+.home-link 
+{
+  background:#1d1f1d;
+  width:75px;
+}
+
