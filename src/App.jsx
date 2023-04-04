@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState, PureComponent} from 'react'
 import './App.css'
 import MovieInfo from './Components/MovieInfo'
 import Footer from './Components/Footer'
 import Card from './Components/Card'
+import RatingsChart from './Components/RatingsChart'
+
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
 
@@ -106,8 +108,6 @@ function App() {
     }
     setVoteAvgTotal(voteAvg.toFixed(3));
     setRatedOverall([lowestTitle, highestTitle]);
-    console.log([lowestTitle, highestTitle]);
-    
     
     // calculate average number of votes cast across movies
     let voteCount = 0;
@@ -134,6 +134,12 @@ function App() {
           <Card heading="Average Votes" subheading={voteCountTotal}/>
           <Card heading="Lowest Rated Title" subheading={ratedOverall[0]}/>
           <Card heading="Highest Rated Title" subheading={ratedOverall[1]}/>
+        </div>
+
+        <div className="charts-container">
+          <RatingsChart
+            list={filteredResults}
+          />
         </div>
         
 

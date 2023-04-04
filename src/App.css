@@ -74,3 +74,23 @@ nav {
   width:75px;
 }
 
+.custom-tooltip {
+  white-space: pre-line;
+  background-color: rgba(224, 148, 55, 0.9);
+}
+
+.recharts-wrapper{
+  margin: 0 auto;
+}
+
+.charts-container {
+  margin: 0 auto;
+}
+
+.rating-tooltip {
+  white-space: pre-line;
+  background-color: rgba(224, 148, 55, 0.9);
+  text-align: left;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
