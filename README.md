@@ -1,33 +1,77 @@
-# Web Development Project 4 - FlickFlix
+# Web Development Project 5 - Flick Flix
 
 Submitted by: Samantha Prestrelski
 
-This web app: Flick through popular movies and discover new favorites.
+This web app: Explore the 20 most popular movies this week.
 
-Time spent: 8 hours spent in total
+Time spent: 10 hours spent in total
 
 ## Required Features
 
 The following **required** functionality is completed:
 
-- [X] **Clicking a button creates a new API fetch request and displays at least three attributes from the returned JSON data**
-- [X] **Only one item/API call is viewable at a time**
-- [X] **API calls appear random to the user**
-- [X] **At least one image is displayed per API call**
-- [X] **Clicking on a displayed value for one attribute adds it to a displayed ban list**
-- [X] **Attributes on the ban list prevent further images/API results with that attribute from being displayed**
+- [X] The list displays a list of data fetched using an API call
+- [X] Data uses the useEffect React hook and async/await syntax
+- [X] The app dashboard includes at least three summary statistics about the data such as
+  - [X] Average rating
+  - [X] Average number of votes cast per movie
+  - [X] Lowest rated popular title
+  - [X] Highest rated popular title
+- [X] A search bar allows the user to search for an item in the fetched data
+- [X] Multiple different filters (2+) allow the user to filter items in the database by specified categories
 
 The following **optional** features are implemented:
 
-- [X] Multiple types of attributes can be added to the ban list
-- [X] Users can see a stored history of their previously viewed items from their session
+- [X] Multiple filters can be applied simultaneously
+- [ ] Filters use different input types such as a text input, a selection, or a slider
+- [X] The user can enter specific bounds for filter values
 
 ## Video Walkthrough
 
-<img src='https://github.com/sprestrelski/flickflix/blob/main/demo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+Here's a walkthrough of implemented user stories:
 
-GIF created with ezgif.
+<img src='https://github.com/sprestrelski/flickflix/blob/dashboard/demo.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
+<!-- Replace this with whatever GIF tool you used! -->
+GIF created with ezgif
+<!-- Recommended tools:
+[Kap](https://getkap.co/) for macOS
+[ScreenToGif](https://www.screentogif.com/) for Windows
+[peek](https://github.com/phw/peek) for Linux. -->
+
+
+# Web Development Project 6 - *Name of App Here*
+
+Submitted by: **Your Name Here**
+
+This web app: **insert description**
+
+Time spent: **X** hours spent in total
+
+## Required Features
+
+The following **required** functionality is completed:
+
+- [ ] **The app includes at least two unique chart developed using the fetched data that tell an interesting story**
+- [X] **Clicking on an item in the list view displays more details about it**
+- [X] **Clicking on an item has a direct, unique link to that item's detail view page**
+
+
+The following **optional** features are implemented:
+
+- [ ] The site's customized dashboard contains more content that explains what is interesting about the data
+- [ ] The site allows users to toggle between different data visualizations
+
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+<!-- Replace this with whatever GIF tool you used! -->
+GIF created with ...  
+<!-- Recommended tools:
+[Kap](https://getkap.co/) for macOS
+[ScreenToGif](https://www.screentogif.com/) for Windows
+[peek](https://github.com/phw/peek) for Linux. -->
 
 ## License
 

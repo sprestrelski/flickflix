@@ -1,150 +1,201 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
-import APIForm from './Components/APIForm'
-import BanList from './Components/BanList'
+import MovieInfo from './Components/MovieInfo'
 import Footer from './Components/Footer'
-import Gallery from './Components/Gallery'
-
+import Card from './Components/Card'
 function App() {
   const ACCESS_KEY = import.meta.env.VITE_MOVIE_API_KEY;
-  const [currentImage, setCurrentImage] = useState(null);
-  const [prevImages, setPrevImages] = useState([]);
-  const [prevTitles, setPrevTitles] = useState([]);
-  
-  const [title, setTitle] = useState("");
-  const [overview, setOverview] = useState("");
-  const [genres, setGenres] = useState([]);
-  
-  const [voteAvg, setVoteAvg] = useState(0);
-  const [banVAvg, setBanVAvg] = useState(0);
 
-  const [voteCount, setVoteCount] = useState(0);
-  const [banVCount, setBanVCount] = useState(0);
+  const [json, setJson] = useState(null);
+  const [list, setList] = useState(null);
+  const [filteredResults, setFilteredResults] = useState([]);
 
-  const [pageIndex, setPageIndex] = useState(100);
-
-  const [banAttrib, setBanAttrib] = useState([]);
-  
-  const submitForm = () => {
-    makeMovieQuery().catch(console.error);  
-  }
-
-  const makeMovieQuery = async () => {
-    let wait_until = "network_idle";
-    let response_type = "json";
-    let fail_on_status = "400%2C404%2C500-511";
-    let sort_by = "popularity.desc"
-    let without_genres = "";
-    let vote_average_gte = banVAvg;
-    let vote_count_gte = banVCount;
-
-    let page = Math.floor(Math.random() * pageIndex) + 1;
-    let query = `https://api.themoviedb.org/3/discover/movie?sort_by=${sort_by}&api_key=${ACCESS_KEY}&page=${page}&without_genres=${without_genres}&vote_average.gte=${vote_average_gte}&vote_count.gte=${vote_count_gte}&include_adult=false&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
-    let response = await fetch(query);
-    let json = await response.json();
-
-    // handle if there are less pages than we have access to
-    if (json.total_pages < page) {
-      setPageIndex(json.total_pages);
-      page = Math.floor(Math.random() * json.total_pages) + 1;
-      query = `https://api.themoviedb.org/3/discover/movie?sort_by=${sort_by}&api_key=${ACCESS_KEY}&page=${page}&without_genres=${without_genres}&vote_average.gte=${vote_average_gte}&vote_count.gte=${vote_count_gte}&include_adult=false&wait_until=${wait_until}&response_type=${response_type}&fail_on_status=${fail_on_status}`;
-      response = await fetch(query);
-      json = await response.json();
+  // fetch top 20 movies this week
+  useEffect(() => {
+    const fetchMovieData = async () => {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/trending/movie/week?api_key=`
+        + ACCESS_KEY
+      );
+      let json = await response.json();
+      setJson(json);
+      setList(json.results);
+      setFilteredResults(json.results);
+      dataStatistics(json.results);
     }
+    fetchMovieData().catch(console.error);
+  }, []);
 
-    console.log(query);
-
-    // get a random result from the page
-    const num_results = json.results.length;
-    const results_index = Math.floor(Math.random() * num_results);
-    const result = json.results[results_index];
+  // master filter function
+  const filterFunction = (searchValue, lowerRange, upperRange) => {
+    let filteredData = list;
+    let useFilter = false;
+    if (searchValue !== "") {
+      filteredData = filteredData.filter( function(movie) {
+        return (movie.title.toLowerCase()).includes(searchValue.toLowerCase())
+      })
+      useFilter = true;
+    }
     
-    // set movie information
-    const poster_url = "https://image.tmdb.org/t/p/" + "w500" + result.poster_path;
-    setTitle(result.title);
-    setOverview(result.overview);
-    setVoteAvg(result.vote_average);
-    setVoteCount(result.vote_count);
-    setCurrentImage(poster_url);
-    setGenres(result.genre_ids);
-    setPrevImages((images) => [...images, poster_url]);
-    setPrevTitles((titles) => [...titles, result.title]);
-    console.log(result);
+    if (lowerRange != 0 || upperRange != 10) {
+      filteredData = filteredData.filter( function(movie) {
+        return (movie.vote_average <= upperRange && movie.vote_average >= lowerRange)
+      })
+      useFilter = true;
+    }
+    
+    if (useFilter) {
+      setFilteredResults(filteredData);
+      dataStatistics(filteredData);
+    } else {
+      setFilteredResults(list);
+      dataStatistics(list);
+    }
+  
+    
   }
 
-  const voteCountHandler = () => {
-    setBanVCount(voteCount);
-    setBanAttrib([...banAttrib, "> " + voteCount + " Votes"]);
+  // filter by title
+  const [searchInput, setSearchInput] = useState("");
+  const filterTitles = searchValue => {
+    setSearchInput(searchValue);
+    filterFunction(searchValue, lowerStarRange, upperStarRange);
   };
 
-  const voteAvgHandler = () => {
-    setBanVAvg(voteAvg);
-    setBanAttrib([...banAttrib, "> " + voteAvg + " Stars"]);
+  // filter by vote average/"stars"
+  const [upperStarRange, setUpperStarRange] = useState(10);
+  const [lowerStarRange, setLowerStarRange] = useState(0);
+
+  const filterStars = (lowerRange, upperRange) => {
+    setUpperStarRange(upperRange);
+    setLowerStarRange(lowerRange);
+    filterFunction(searchInput, lowerRange, upperRange);
+  }
+
+
+  // data statistics
+  const [voteAvgTotal, setVoteAvgTotal] = useState(0);
+  const [voteCountTotal, setVoteCountTotal] = useState(0);
+  const [ratedOverall, setRatedOverall] = useState(["", ""]);
+  const dataStatistics = (filteredData) => {
+    // calculate average rating of movies
+    let voteAvg = 0;
+    let lowestAvg = 0, highestAvg = 0;
+    let lowestTitle = "", highestTitle = "";
+
+    if (filteredData.length <= 0) voteAvg = 0;
+    else {
+      lowestAvg = filteredData[0].vote_average;
+      highestAvg = filteredData[0].vote_average;
+      lowestTitle = filteredData[0].title;
+      highestTitle = filteredData[0].title;
+      
+      for (let item = 0; item < filteredData.length; item++) {
+        let avg = filteredData[item].vote_average
+        voteAvg += avg;
+        if (avg < lowestAvg) {
+          lowestTitle = filteredData[item].title;
+          lowestAvg = avg;
+        } else if (avg > highestAvg) {
+          highestTitle = filteredData[item].title;
+          highestAvg = avg;
+        }
+      }
+      voteAvg /= filteredData.length;
+      
+    }
+    setVoteAvgTotal(voteAvg.toFixed(3));
+    setRatedOverall([lowestTitle, highestTitle]);
+    console.log([lowestTitle, highestTitle]);
+    
+    
+    // calculate average number of votes cast across movies
+    let voteCount = 0;
+    if (filteredData.length <= 0) voteCount = 0;
+    else {
+      for (const item in filteredData) {
+        voteCount += filteredData[item].vote_count;
+      }
+      voteCount/= filteredData.length;
+    }
+    setVoteCountTotal(voteCount.toFixed(0));
+    
   }
 
   return (
     <div className="App">
       <div className="main">
         <h1>Flick Flix 🎥</h1>
-        Flick through popular movies and discover new favorites.
+        Explore the most popular movies this week. 
+        <br></br>
+
+        <div className="cards-container">
+          <Card heading="Average Rating" subheading={voteAvgTotal}/>
+          <Card heading="Average Votes" subheading={voteCountTotal}/>
+          <Card heading="Lowest Rated Title" subheading={ratedOverall[0]}/>
+          <Card heading="Highest Rated Title" subheading={ratedOverall[1]}/>
+        </div>
         
-        {currentImage ? (
-        <div className="filter-container">
-                Don't like these recommendations? Filter to
-                <button className="filterButton"
-                  onClick={voteAvgHandler}
-                >
-                  &gt; {voteAvg} Stars
-                </button>
-                <button className="filterButton"
-                  onClick={voteCountHandler}>
-                  &gt; {voteCount} Votes
-                </button>
+
+        <div className="input-container">
+          Filter:&nbsp;<input
+            type="text"
+            placeholder="Search Titles"
+            onChange={(inputString) => filterTitles(inputString.target.value)}
+          />
         </div>
-        ) : (
-          <div></div>
-        )}
 
-        <APIForm 
-          onSubmit={submitForm}  
-        />
+        <div className="input-container">
+          Ratings:&nbsp;
+          <input
+            className="starRange"
+            type="number"
+            value={lowerStarRange}
+            step="0.01"
+            min="0"
+            max="10"
+            onChange={(inputString) => filterStars(inputString.target.value, upperStarRange)}
+          />
+          <input
+            className="starRange"
+            type="number"
+            value={upperStarRange}
+            step="0.01"
+            min="0"
+            max="10"
+            onChange={(inputString) => filterStars(lowerStarRange, inputString.target.value)}
+          />
+        </div>
 
-        {currentImage ? (
-          <div className="movieInfo">
-
-            <div className="movie">
-              <div className="movieHeader">
-                <h2>{title}</h2>
-                <h4>{voteAvg}/10 ⭐ | {voteCount} votes</h4>
-              </div>
-              <div className="movieOverview">
-                <p>{overview}</p>
-              </div>
-            </div>
-
-            <div className="movie">
-              <img
-                className="moviePoster"
-                src={currentImage}
-                alt="movie poster returned"
-              />
-            </div>
-
-          </div>
-        ) : (
-          <div></div>
-        )}
+        <ul>
+          {searchInput.length > 0 || lowerStarRange != 0 || upperStarRange != 10
+            ? filteredResults.map((index) => 
+                <MovieInfo
+                key={index.id}
+                id={index.id}
+                title={index.title}
+                image={index.poster_path}
+                voteAvg={index.vote_average}
+                voteCount={index.vote_count}
+                overview={index.overview}
+                releaseDate={index.release_date}
+                />
+              
+              ) : list && list.map((index) =>
+                <MovieInfo
+                  key={index.id}
+                  id={index.id}
+                  title={index.title}
+                  image={index.poster_path}
+                  voteAvg={index.vote_average}
+                  voteCount={index.vote_count}
+                  overview={index.overview}
+                  releaseDate={index.release_date}
+                />
+          )}
+          
+        </ul>
       </div>
-      
-      {currentImage ? (
-        <div className="extras">
-          <Gallery images={prevImages} titles={prevTitles}/>
-          <BanList bans={banAttrib}/>
-        </div>
-      
-      ) : (
-        <div></div>
-      )}
       
       <Footer/>
     </div>
